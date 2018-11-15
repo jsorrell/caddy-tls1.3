@@ -1,0 +1,69 @@
+diff --git a/caddytls/config.go b/caddytls/config.go
+index 8cf61e4..bb1c717 100644
+--- a/caddytls/config.go
++++ b/caddytls/config.go
+@@ -560,7 +560,7 @@ func SetDefaultTLSParams(config *Config) {
+ 		config.ProtocolMinVersion = tls.VersionTLS12
+ 	}
+ 	if config.ProtocolMaxVersion == 0 {
+-		config.ProtocolMaxVersion = tls.VersionTLS12
++		config.ProtocolMaxVersion = tls.VersionTLS13
+ 	}
+ 
+ 	// Prefer server cipher suites
+@@ -583,6 +583,7 @@ var SupportedProtocols = map[string]uint16{
+ 	"tls1.0": tls.VersionTLS10,
+ 	"tls1.1": tls.VersionTLS11,
+ 	"tls1.2": tls.VersionTLS12,
++	"tls1.3": tls.VersionTLS13,
+ }
+ 
+ // GetSupportedProtocolName returns the protocol name
+@@ -607,6 +608,9 @@ func GetSupportedProtocolName(protocol uint16) (string, error) {
+ //
+ // This map, like any map, is NOT ORDERED. Do not range over this map.
+ var SupportedCiphersMap = map[string]uint16{
++	"TLS13-AES-256-GCM-SHA384":           tls.TLS_AES_256_GCM_SHA384,
++	"TLS13-AES-128-GCM-SHA256":           tls.TLS_AES_128_GCM_SHA256,
++	"TLS13-CHACHA20-POLY1305-SHA256":     tls.TLS_CHACHA20_POLY1305_SHA256,
+ 	"ECDHE-ECDSA-AES256-GCM-SHA384":      tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
+ 	"ECDHE-RSA-AES256-GCM-SHA384":        tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
+ 	"ECDHE-ECDSA-AES128-GCM-SHA256":      tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
+@@ -617,10 +621,7 @@ var SupportedCiphersMap = map[string]uint16{
+ 	"ECDHE-RSA-AES128-CBC-SHA":           tls.TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,
+ 	"ECDHE-ECDSA-AES256-CBC-SHA":         tls.TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA,
+ 	"ECDHE-ECDSA-AES128-CBC-SHA":         tls.TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA,
+-	"RSA-AES256-CBC-SHA":                 tls.TLS_RSA_WITH_AES_256_CBC_SHA,
+-	"RSA-AES128-CBC-SHA":                 tls.TLS_RSA_WITH_AES_128_CBC_SHA,
+ 	"ECDHE-RSA-3DES-EDE-CBC-SHA":         tls.TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA,
+-	"RSA-3DES-EDE-CBC-SHA":               tls.TLS_RSA_WITH_3DES_EDE_CBC_SHA,
+ }
+ 
+ // GetSupportedCipherName returns the cipher name
+@@ -636,6 +637,9 @@ func GetSupportedCipherName(cipher uint16) (string, error) {
+ 
+ // List of all the ciphers we want to use by default
+ var defaultCiphers = []uint16{
++	tls.TLS_AES_256_GCM_SHA384,
++	tls.TLS_AES_128_GCM_SHA256,
++	tls.TLS_CHACHA20_POLY1305_SHA256,
+ 	tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
+ 	tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
+ 	tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
+@@ -650,6 +654,9 @@ var defaultCiphers = []uint16{
+ 
+ // List of ciphers we should prefer if native AESNI support is missing
+ var defaultCiphersNonAESNI = []uint16{
++	tls.TLS_CHACHA20_POLY1305_SHA256,
++	tls.TLS_AES_256_GCM_SHA384,
++	tls.TLS_AES_128_GCM_SHA256,
+ 	tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,
+ 	tls.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,
+ 	tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
+@@ -691,6 +698,7 @@ var supportedCurvesMap = map[string]tls.CurveID{
+ // The latter ones can be found here: https://github.com/golang/go/tree/master/src/crypto/elliptic
+ var defaultCurves = []tls.CurveID{
+ 	tls.X25519,
++	tls.CurveP384,
+ 	tls.CurveP256,
+ }
